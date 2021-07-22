@@ -4,6 +4,7 @@ import matplotlib
 import matplotlib.pyplot as pyplot
 import subprocess
 import warnings
+from matplotlib.ticker import AutoMinorLocator
 from pathlib import Path
 
 __all__ = []
@@ -22,14 +23,22 @@ __all__ = []
 # inches: 72 pt = 1 inch.
 pt = 1.0 / 72.0
 
+# Golden ratio.
+golden = 1.618033
+
 MMMPL_RC = {
     "mmmpl.doc.common": {
         "axes.linewidth": 0.5,
         "axes.titlepad": 10,
-        "lines.linewidth": 0.75,
         "font.family": "sans-serif",
         "font.sans-serif": ["Helvetica", "Arial", "sans-serif"],
+        "legend.fontsize": 9.0,
+        "legend.frameon": False,
+        "lines.linewidth": 0.75,
         "mathtext.fontset": "stixsans",
+        "savefig.dpi": 600,
+        "xtick.minor.visible": True,
+        "ytick.minor.visible": True,
     },
 
     # For usage with REVTeX.
@@ -42,7 +51,7 @@ MMMPL_RC = {
     # For usage with the standard LaTeX classes article, book, etc.
     "mmmpl.doc.standard": {
         "figure.figsize": [260 * pt, 260 * pt * 0.75],
-        "figure.widefigsize": [345 * pt, 345 * pt * 0.75],
+        "figure.widefigsize": [315 * pt, 315 / golden * pt],
         "font.size": 10.0,
     },
 
@@ -166,3 +175,12 @@ def rc_context(rc=None, fname=None):
     return matplotlib.rc_context(rc, fname)
 
 pyplot.rc_context = rc_context
+
+# By default, Matplotlib uses 5 minor ticks between major ticks if the
+# number of ticks are not supplied.  But we like 2 ticks.
+@pyplot._copy_docstring_and_deprecators(AutoMinorLocator)
+class MinorLocator(AutoMinorLocator):
+    def __init__(self, n=2):
+        super().__init__(n=n)
+
+matplotlib.ticker.AutoMinorLocator = MinorLocator
