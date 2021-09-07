@@ -39,20 +39,29 @@ MMMPL_RC = {
         "savefig.dpi": 600,
         "xtick.minor.visible": True,
         "ytick.minor.visible": True,
+        "xtick.major.width": 0.5,
+        "xtick.minor.width": 0.5,
+        "ytick.major.width": 0.5,
+        "ytick.minor.width": 0.5,
     },
 
     # For usage with REVTeX.
     "mmmpl.doc.aps": {
-        "figure.figsize": [246 * pt, 246 * pt * 0.75],
+        "figure.figsize": [246 * pt, 246 / golden * pt ],
         "figure.widefigsize": [510 * pt, 246 * pt * 0.75],
         "font.size": 9.0,
+        "legend.fontsize": 8.5,
+        "legend.numpoints": 1,
+        "legend.handlelength": 1.25,
+        "legend.scatterpoints": 1,
+        "legend.labelspacing": 0.2,
     },
 
     # For usage with the standard LaTeX classes article, book, etc.
     "mmmpl.doc.standard": {
         "figure.figsize": [260 * pt, 260 * pt * 0.75],
         "figure.widefigsize": [315 * pt, 315 / golden * pt],
-        "font.size": 10.0,
+        "font.size": 9.0
     },
 
     # Matplotlib loads certain LaTeX package according to the sans and serif
@@ -62,11 +71,20 @@ MMMPL_RC = {
         "font.sans-serif": "",
         "font.serif": "",
     },
-    "mmmpl.tex.font.mathtime": {
-        "text.latex.preamble": r"\usepackage[sans,bm]{mathtime}"
-    },
     "mmmpl.tex.font.cmbright": {
         "text.latex.preamble": r"\usepackage{amsfonts,amssymb,bm,cmbright}"
+    },
+    "mmmpl.tex.font.mathtime": {
+        "text.latex.preamble": r"\usepackage[sans]{mathtime}"
+    },
+    "mmmpl.tex.font.newtx": {
+        "text.latex.preamble": r"\usepackage[sans,newtx]{mathtime}"
+    },
+    "mmmpl.tex.font.sansmath": {
+        "text.latex.preamble": r"""\renewcommand{\familydefault}{\sfdefault}
+        \usepackage{lmodern,amsfonts,amssymb,bm,sansmath}
+        \sansmath
+        """
     },
     "mmmpl.tex": {
         "text.usetex": True
@@ -83,7 +101,7 @@ def make_rc(rc):
     true_rc = {}
 
     for key, val in rc.items():
-        if key in MMMPL_RC_MISC:
+        if key in MMMPL_RC_MISC or key in pyplot.rcParams:
             continue
 
         common = "{}.{}".format(key, "common")
@@ -93,8 +111,6 @@ def make_rc(rc):
         true_key = "{}.{}".format(key, val)
         if true_key in MMMPL_RC:
             true_rc.update(MMMPL_RC[true_key])
-        elif key in pyplot.rcParams:
-            true_rc.update({ key: val })
         else:
             raise ValueError("'{}': '{}' is an invalid rcParam.".format(key, val))
 
@@ -119,6 +135,11 @@ def make_rc(rc):
     for key in WEED_KEYS:
         if key in true_rc:
             true_rc.pop(key)
+
+    # Override mmmpl's settings with actual rc keys if present.
+    for key, val in rc.items():
+        if key in pyplot.rcParams:
+            true_rc.update({ key: val })
 
     return true_rc
 
@@ -177,10 +198,10 @@ def rc_context(rc=None, fname=None):
 pyplot.rc_context = rc_context
 
 # By default, Matplotlib uses 5 minor ticks between major ticks if the
-# number of ticks are not supplied.  But we like 2 ticks.
+# number of ticks are not supplied.  But we like 4 ticks.
 @pyplot._copy_docstring_and_deprecators(AutoMinorLocator)
 class MinorLocator(AutoMinorLocator):
-    def __init__(self, n=2):
+    def __init__(self, n=4):
         super().__init__(n=n)
 
 matplotlib.ticker.AutoMinorLocator = MinorLocator
