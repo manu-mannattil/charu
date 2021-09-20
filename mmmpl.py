@@ -74,11 +74,23 @@ MMMPL_RC = {
     "mmmpl.tex.font.cmbright": {
         "text.latex.preamble": r"\usepackage{amsfonts,amssymb,bm,cmbright}"
     },
+    "mmmpl.tex.font.fourier": {
+        "text.latex.preamble": r"""\usepackage[widespace]{fourier}
+        \usepackage[scaled=0.92]{helvet}
+        \usepackage{latinsans}
+        \DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
+        \SetMathAlphabet{\mathcal}{bold}{OMS}{cmsy}{b}{n}
+        """
+    },
     "mmmpl.tex.font.mathtime": {
-        "text.latex.preamble": r"\usepackage[sans]{mathtime}"
+        "text.latex.preamble": r"""\usepackage[sans]{mathtime}
+        \usepackage{latinsans}
+        """
     },
     "mmmpl.tex.font.newtx": {
-        "text.latex.preamble": r"\usepackage[sans,newtx]{mathtime}"
+        "text.latex.preamble": r"""\usepackage[newtx]{mathtime}
+        \usepackage{latinsans}
+        """
     },
     "mmmpl.tex.font.sansmath": {
         "text.latex.preamble": r"""\renewcommand{\familydefault}{\sfdefault}
