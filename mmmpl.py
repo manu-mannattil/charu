@@ -2,6 +2,7 @@
 
 import matplotlib
 import matplotlib.pyplot as pyplot
+import mpl_toolkits
 import subprocess
 import warnings
 from matplotlib.ticker import AutoMinorLocator
@@ -32,36 +33,39 @@ MMMPL_RC = {
         "axes.titlepad": 10,
         "font.family": "sans-serif",
         "font.sans-serif": ["Helvetica", "Arial", "sans-serif"],
+        "grid.color": "#cccccc",
+        "grid.linestyle": "--",
+        "grid.linewidth": 0.5,
         "legend.fontsize": 9.0,
         "legend.frameon": False,
         "lines.linewidth": 0.75,
         "mathtext.fontset": "stixsans",
         "savefig.dpi": 600,
-        "xtick.minor.visible": True,
-        "ytick.minor.visible": True,
         "xtick.major.width": 0.5,
+        "xtick.minor.visible": True,
         "xtick.minor.width": 0.5,
         "ytick.major.width": 0.5,
+        "ytick.minor.visible": True,
         "ytick.minor.width": 0.5,
     },
 
     # For usage with REVTeX.
     "mmmpl.doc.aps": {
-        "figure.figsize": [246 * pt, 246 / golden * pt ],
+        "figure.figsize": [246 * pt, 246 / golden * pt],
         "figure.widefigsize": [510 * pt, 246 * pt * 0.75],
-        "font.size": 9.0,
-        "legend.fontsize": 8.5,
-        "legend.numpoints": 1,
+        "font.size": 8.0,
+        "legend.fontsize": 7.5,
         "legend.handlelength": 1.25,
-        "legend.scatterpoints": 1,
         "legend.labelspacing": 0.2,
+        "legend.numpoints": 1,
+        "legend.scatterpoints": 1,
     },
 
     # For usage with the standard LaTeX classes article, book, etc.
     "mmmpl.doc.standard": {
-        "figure.figsize": [260 * pt, 260 * pt * 0.75],
+        "figure.figsize": [260 * pt, 260 / golden * pt],
         "figure.widefigsize": [315 * pt, 315 / golden * pt],
-        "font.size": 9.0
+        "font.size": 8.0
     },
 
     # Matplotlib loads certain LaTeX package according to the sans and serif
@@ -76,16 +80,14 @@ MMMPL_RC = {
     },
     "mmmpl.tex.font.fourier": {
         "text.latex.preamble": r"""\usepackage[widespace]{fourier}
-        \usepackage[scaled=0.92]{helvet}
+        \usepackage[scale=0.92]{tgheros}
         \usepackage{latinsans}
         \DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
         \SetMathAlphabet{\mathcal}{bold}{OMS}{cmsy}{b}{n}
         """
     },
     "mmmpl.tex.font.mathtime": {
-        "text.latex.preamble": r"""\usepackage[sans]{mathtime}
-        \usepackage{latinsans}
-        """
+        "text.latex.preamble": r"""\usepackage{mathtime,latinsans}"""
     },
     "mmmpl.tex.font.newtx": {
         "text.latex.preamble": r"""\usepackage[newtx]{mathtime}
@@ -93,10 +95,7 @@ MMMPL_RC = {
         """
     },
     "mmmpl.tex.font.sansmath": {
-        "text.latex.preamble": r"""\renewcommand{\familydefault}{\sfdefault}
-        \usepackage{lmodern,amsfonts,amssymb,bm,sansmath}
-        \sansmath
-        """
+        "text.latex.preamble": r"""\usepackage{lmodern,amsfonts,amssymb,bm,latinsans}"""
     },
     "mmmpl.tex": {
         "text.usetex": True
@@ -126,6 +125,11 @@ def make_rc(rc):
         else:
             raise ValueError("'{}': '{}' is an invalid rcParam.".format(key, val))
 
+    # Override mmmpl's settings with actual rc keys if present.
+    for key, val in rc.items():
+        if key in pyplot.rcParams:
+            true_rc.update({ key: val })
+
     if rc.get("mmmpl.tex", False):
         true_rc.update(MMMPL_RC["mmmpl.tex"])
 
@@ -147,11 +151,6 @@ def make_rc(rc):
     for key in WEED_KEYS:
         if key in true_rc:
             true_rc.pop(key)
-
-    # Override mmmpl's settings with actual rc keys if present.
-    for key, val in rc.items():
-        if key in pyplot.rcParams:
-            true_rc.update({ key: val })
 
     return true_rc
 
@@ -217,3 +216,35 @@ class MinorLocator(AutoMinorLocator):
         super().__init__(n=n)
 
 matplotlib.ticker.AutoMinorLocator = MinorLocator
+
+# Better 3D axes.
+class Axes3Dx(mpl_toolkits.mplot3d.axes3d.Axes3D):
+    name = "3dx"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.grid(True)
+        self.patch.set_alpha(0)
+
+        # Tweaks for all axes.
+        for axis in (self.xaxis, self.yaxis, self.zaxis):
+            axis._axinfo["tick"].update({"inward_factor": 0, "outward_factor": 0.25})
+            axis.pane.fill = False
+            axis.set_rotate_label(False)
+
+        # Tweaks for x and y axes.
+        for axis in (self.xaxis, self.yaxis):
+            axis.pane.set_edgecolor("black")
+            axis.pane.set_linewidth(matplotlib.rcParams["axes.linewidth"])
+
+        # Tweaks just for the zaxis.
+        self.zaxis._axinfo.update({
+                # Use this to reposition the spine of a particular axis.  This is an
+                # undocumented part of the Matplotlib API and may break any time.
+                # In fact, the conventions have changed from the time of this 2018
+                # StackOverflow answer: https://stackoverflow.com/a/49601745
+                "juggled": (1, 2, 1),
+                # Aline the ticks along the y axis.
+                "tickdir": 1,
+        })
+
+matplotlib.projections.register_projection(Axes3Dx)
