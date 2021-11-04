@@ -63,6 +63,20 @@ plt.savefig("file.pdf", crop=True, optimize=True)
 plt.savefig("file.png", crop=True, optimize=True)
 ```
 
+### Generate formatted ticks and labels
+
+The function `ticklabels` can be used to generate evenly-spaced ticks
+and labels with proper formatting for fractions.
+
+```python
+>>> ticks, labels = mmmpl.ticklabels(start=-2*np.pi, stop=2*np.pi, num=9, div=np.pi, divstr=r"\pi")
+>>> ticks
+array([-6.28318531, -4.71238898, -3.14159265, -1.57079633,  0.        ,
+        1.57079633,  3.14159265,  4.71238898,  6.28318531])
+>>> labels
+['$-2\pi$', '$-3\pi/2$', '$-\pi$', '$-\pi/2$', '$0$', '$\pi/2$', '$\pi$', '$3\pi/2$', '$2\pi$']
+```
+
 ## License
 
 Public domain.  See the file UNLICENSE for more details.

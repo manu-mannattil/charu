@@ -3,10 +3,12 @@
 import matplotlib
 import matplotlib.pyplot as pyplot
 import mpl_toolkits
+import numpy as np
 import subprocess
 import warnings
 from matplotlib.ticker import AutoMinorLocator
 from pathlib import Path
+from fractions import Fraction
 
 __all__ = []
 
@@ -220,6 +222,7 @@ matplotlib.ticker.AutoMinorLocator = MinorLocator
 # Better 3D axes.
 class Axes3Dx(mpl_toolkits.mplot3d.axes3d.Axes3D):
     name = "3dx"
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.grid(True)
@@ -227,7 +230,7 @@ class Axes3Dx(mpl_toolkits.mplot3d.axes3d.Axes3D):
 
         # Tweaks for all axes.
         for axis in (self.xaxis, self.yaxis, self.zaxis):
-            axis._axinfo["tick"].update({"inward_factor": 0, "outward_factor": 0.25})
+            axis._axinfo["tick"].update({ "inward_factor": 0, "outward_factor": 0.25 })
             axis.pane.fill = False
             axis.set_rotate_label(False)
 
@@ -238,13 +241,45 @@ class Axes3Dx(mpl_toolkits.mplot3d.axes3d.Axes3D):
 
         # Tweaks just for the zaxis.
         self.zaxis._axinfo.update({
-                # Use this to reposition the spine of a particular axis.  This is an
-                # undocumented part of the Matplotlib API and may break any time.
-                # In fact, the conventions have changed from the time of this 2018
-                # StackOverflow answer: https://stackoverflow.com/a/49601745
-                "juggled": (1, 2, 1),
-                # Aline the ticks along the y axis.
-                "tickdir": 1,
+            # Use this to reposition the spine of a particular axis.  This is an
+            # undocumented part of the Matplotlib API and may break any time.
+            # In fact, the conventions have changed from the time of this 2018
+            # StackOverflow answer: https://stackoverflow.com/a/49601745
+            "juggled": (1, 2, 1),
+            # Aline the ticks along the y axis.
+            "tickdir": 1,
         })
 
+    # Right align z labels because now the z axis is on the left.
+    def set_zticklabels(self, labels, ha="right", **kwargs):
+        return super().set_zticklabels(labels, ha=ha, **kwargs)
+
 matplotlib.projections.register_projection(Axes3Dx)
+
+def ticklabels(start, stop, num=10, div=1, divstr=None, digits=5):
+    """Return evenly spaced fractional ticks and labels over an interval."""
+    a, b = Fraction(round(start / div, digits)), Fraction(round(stop / div, digits))
+    step = (b-a) / (num-1)
+    ticks, labels = [], []
+    for i in range(num):
+        f = a + i*step
+        ticks.append(div * float(f))
+        if (divstr is None) or (f == 0):
+            labels.append(r"${}$".format(f))
+        else:
+            if abs(f.denominator) == 1:
+                if f == 1:
+                    labels.append(r"${}$".format(divstr))
+                elif f == -1:
+                    labels.append(r"$-{}$".format(divstr))
+                else:
+                    labels.append(r"${}{}$".format(f.numerator, divstr))
+            elif abs(f.numerator) == 1:
+                if f > 0:
+                    labels.append(r"${}/{}$".format(divstr, f.denominator))
+                else:
+                    labels.append(r"$-{}/{}$".format(divstr, f.denominator))
+            else:
+                labels.append(r"${}{}/{}$".format(f.numerator, divstr, f.denominator))
+
+    return np.array(ticks), labels
