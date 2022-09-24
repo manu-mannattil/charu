@@ -29,8 +29,8 @@ pt = 1.0 / 72.0
 # Golden ratio.
 golden = 1.618033
 
-MMMPL_RC = {
-    "mmmpl.doc.common": {
+CHARU_RC = {
+    "charu.doc.common": {
         "axes.linewidth": 0.5,
         "axes.titlepad": 10,
         "font.family": "sans-serif",
@@ -52,19 +52,19 @@ MMMPL_RC = {
     },
 
     # For usage with REVTeX.
-    "mmmpl.doc.aps": {
+    "charu.doc.aps": {
         "figure.figsize": [246 * pt, 246 / golden * pt],
         "figure.widefigsize": [510 * pt, 246 * pt * 0.75],
         "font.size": 8.0,
         "legend.fontsize": 7.5,
-        "legend.handlelength": 1.25,
+        "legend.handlelength": 1.45,
         "legend.labelspacing": 0.2,
         "legend.numpoints": 1,
         "legend.scatterpoints": 1,
     },
 
     # For usage with the standard LaTeX classes article, book, etc.
-    "mmmpl.doc.standard": {
+    "charu.doc.standard": {
         "figure.figsize": [260 * pt, 260 / golden * pt],
         "figure.widefigsize": [315 * pt, 315 / golden * pt],
         "font.size": 8.0
@@ -73,38 +73,39 @@ MMMPL_RC = {
     # Matplotlib loads certain LaTeX package according to the sans and serif
     # fonts we set.  These packages often conflict with the ones that we
     # load in the custom preamble, so we blank the sans and serif fonts.
-    "mmmpl.tex.font.common": {
+    "charu.tex.font.common": {
         "font.sans-serif": "",
         "font.serif": "",
     },
-    "mmmpl.tex.font.cmbright": {
+    "charu.tex.font.cmbright": {
         "text.latex.preamble": r"\usepackage{amsfonts,amssymb,bm,cmbright}"
     },
-    "mmmpl.tex.font.fourier": {
-        "text.latex.preamble": r"""\usepackage[widespace]{fourier}
-        \usepackage[scale=0.92]{tgheros}
-        \usepackage{latinsans}
-        \DeclareMathAlphabet{\mathcal}{OMS}{cmsy}{m}{n}
-        \SetMathAlphabet{\mathcal}{bold}{OMS}{cmsy}{b}{n}
+    "charu.tex.font.fourier": {
+        "text.latex.preamble": r"""\usepackage{fourierx}
+        \usepackage[sans]{fammath}
         """
     },
-    "mmmpl.tex.font.mathtime": {
-        "text.latex.preamble": r"""\usepackage{mathtime,latinsans}"""
+    "charu.tex.font.mathtime": {
+        "text.latex.preamble": r"""\usepackage{mathtime}
+        \usepackage[sans]{fammath}
+        """
     },
-    "mmmpl.tex.font.newtx": {
+    "charu.tex.font.newtx": {
         "text.latex.preamble": r"""\usepackage[newtx]{mathtime}
-        \usepackage{latinsans}
+        \usepackage[sans]{fammath}
         """
     },
-    "mmmpl.tex.font.sansmath": {
-        "text.latex.preamble": r"""\usepackage{lmodern,amsfonts,amssymb,bm,latinsans}"""
+    "charu.tex.font.sansmath": {
+        "text.latex.preamble": r"""\usepackage{lmodern,amsfonts,amssymb,bm}
+        \usepackage[sans]{fammath}
+        """
     },
-    "mmmpl.tex": {
+    "charu.tex": {
         "text.usetex": True
     },
 }
 
-MMMPL_RC_MISC = ["mmmpl.wide", "mmmpl.square", "mmmpl.tex", "mmmpl.tex.preamble"]
+CHARU_RC_MISC = ["charu.wide", "charu.square", "charu.tex", "charu.tex.preamble"]
 
 # rcParams that are not standard.
 WEED_KEYS = ["figure.widefigsize"]
@@ -114,40 +115,40 @@ def make_rc(rc):
     true_rc = {}
 
     for key, val in rc.items():
-        if key in MMMPL_RC_MISC or key in pyplot.rcParams:
+        if key in CHARU_RC_MISC or key in pyplot.rcParams:
             continue
 
         common = "{}.{}".format(key, "common")
-        if common in MMMPL_RC:
-            true_rc.update(MMMPL_RC[common])
+        if common in CHARU_RC:
+            true_rc.update(CHARU_RC[common])
 
         true_key = "{}.{}".format(key, val)
-        if true_key in MMMPL_RC:
-            true_rc.update(MMMPL_RC[true_key])
+        if true_key in CHARU_RC:
+            true_rc.update(CHARU_RC[true_key])
         else:
             raise ValueError("'{}': '{}' is an invalid rcParam.".format(key, val))
 
-    # Override mmmpl's settings with actual rc keys if present.
+    # Override charu's settings with actual rc keys if present.
     for key, val in rc.items():
         if key in pyplot.rcParams:
             true_rc.update({ key: val })
 
-    if rc.get("mmmpl.tex", False):
-        true_rc.update(MMMPL_RC["mmmpl.tex"])
+    if rc.get("charu.tex", False):
+        true_rc.update(CHARU_RC["charu.tex"])
 
-    if rc.get("mmmpl.wide", False) and "figure.widefigsize" in true_rc:
+    if rc.get("charu.wide", False) and "figure.widefigsize" in true_rc:
         true_rc["figure.figsize"] = true_rc["figure.widefigsize"]
 
-    if "mmmpl.square" in rc and "figure.figsize" in true_rc:
-        val = rc["mmmpl.square"]
+    if "charu.square" in rc and "figure.figsize" in true_rc:
+        val = rc["charu.square"]
         if val in (0, 1):
             size = true_rc["figure.figsize"]
             true_rc["figure.figsize"] = [size[val], size[val]]
         else:
-            raise ValueError("'mmmpl.square' must be 0 or 1.")
+            raise ValueError("'charu.square' must be 0 or 1.")
 
     # Append LaTeX preamble if any.
-    preamble = true_rc.get("text.latex.preamble", "") + rc.get("mmmpl.tex.preamble", "")
+    preamble = true_rc.get("text.latex.preamble", "") + rc.get("charu.tex.preamble", "")
     true_rc.update({ "text.latex.preamble": preamble })
 
     for key in WEED_KEYS:
@@ -246,7 +247,7 @@ class Axes3Dx(mpl_toolkits.mplot3d.axes3d.Axes3D):
             # In fact, the conventions have changed from the time of this 2018
             # StackOverflow answer: https://stackoverflow.com/a/49601745
             "juggled": (1, 2, 1),
-            # Aline the ticks along the y axis.
+            # Align the ticks along the y axis.
             "tickdir": 1,
         })
 
