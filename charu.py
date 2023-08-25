@@ -41,6 +41,8 @@ CHARU_RC = {
         "legend.fontsize": 9.0,
         "legend.frameon": False,
         "lines.linewidth": 0.75,
+        "lines.markersize": 1.5,
+        "contour.linewidth": 0.75,
         "mathtext.fontset": "stixsans",
         "savefig.dpi": 600,
         "xtick.major.width": 0.5,
@@ -49,12 +51,25 @@ CHARU_RC = {
         "ytick.major.width": 0.5,
         "ytick.minor.visible": True,
         "ytick.minor.width": 0.5,
+        "scatter.edgecolors": "none",
     },
 
     # For usage with REVTeX.
     "charu.doc.aps": {
         "figure.figsize": [246 * pt, 246 / golden * pt],
         "figure.widefigsize": [510 * pt, 246 * pt * 0.75],
+        "font.size": 8.0,
+        "legend.fontsize": 7.5,
+        "legend.handlelength": 1.45,
+        "legend.labelspacing": 0.2,
+        "legend.numpoints": 1,
+        "legend.scatterpoints": 1,
+    },
+
+    # For usage with RSPA.
+    "charu.doc.rspa": {
+        "figure.figsize": [400 * 0.5 * pt, 400 * 0.5 / golden * pt],
+        "figure.widefigsize": [400 * 0.75 * pt, 400 * 0.75 / golden * pt],
         "font.size": 8.0,
         "legend.fontsize": 7.5,
         "legend.handlelength": 1.45,
