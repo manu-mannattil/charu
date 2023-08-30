@@ -9,7 +9,6 @@ rc = {
     "charu.tex": True,
     "charu.tex.font": "lmodern",
     "charu.wide": True,
-    "font.family": "serif",
 }
 
 with plt.rc_context(rc):

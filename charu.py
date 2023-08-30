@@ -92,7 +92,8 @@ CHARU_RC = {
         "font.serif": "",
     },
     "charu.tex.font.lmodern": {
-        "text.latex.preamble": r"\usepackage{amsfonts,amssymb,bm,lmodern}"
+        "text.latex.preamble": r"\usepackage{amsfonts,amssymb,bm,lmodern}",
+        "font.family": "serif"
     },
     "charu.tex.font.cmbright": {
         "text.latex.preamble": r"\usepackage{amsfonts,amssymb,bm,cmbright}"
