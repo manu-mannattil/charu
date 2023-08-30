@@ -57,7 +57,7 @@ CHARU_RC = {
     # For usage with REVTeX.
     "charu.doc.aps": {
         "figure.figsize": [246 * pt, 246 / golden * pt],
-        "figure.widefigsize": [510 * pt, 246 * pt * 0.75],
+        "figure.widefigsize": [505 * pt, 246 * 0.75 * pt],
         "font.size": 8.0,
         "legend.fontsize": 7.5,
         "legend.handlelength": 1.45,
@@ -69,7 +69,6 @@ CHARU_RC = {
     # For usage with RSPA.
     "charu.doc.rspa": {
         "figure.figsize": [400 * 0.5 * pt, 400 * 0.5 / golden * pt],
-        "figure.widefigsize": [400 * 0.75 * pt, 400 * 0.75 / golden * pt],
         "font.size": 8.0,
         "legend.fontsize": 7.5,
         "legend.handlelength": 1.45,
@@ -91,6 +90,9 @@ CHARU_RC = {
     "charu.tex.font.common": {
         "font.sans-serif": "",
         "font.serif": "",
+    },
+    "charu.tex.font.lmodern": {
+        "text.latex.preamble": r"\usepackage{amsfonts,amssymb,bm,lmodern}"
     },
     "charu.tex.font.cmbright": {
         "text.latex.preamble": r"\usepackage{amsfonts,amssymb,bm,cmbright}"
@@ -222,6 +224,7 @@ pyplot.savefig = savefig
 def rc_context(rc=None, fname=None):
     if rc:
         rc = make_rc(rc)
+
     return matplotlib.rc_context(rc, fname)
 
 pyplot.rc_context = rc_context
